@@ -11,12 +11,14 @@ In this first notebook, my goal was to build the baselines and see the differenc
 * **What I tried:** I built a simple and a deep version of an ANN (using standard linear layers), and compared them to basic CNNs. 
 * **The results:** Treating an image as a flat 784-item list (the ANN approach) made the reconstructed images look pretty blurry. The CNNs did a much better job of keeping the actual shapes of the characters intact, but they were still a bit rough around the edges.
 
-## 2. Fixing the "Blur" with Skip Connections
+## 2. Fixing the "Blur" with Skip Connections & LeakyReLU
 **File:** `autoencoders-ann-vs-optimized-cnn-with-skip-conn.ipynb`
 
-I noticed that squeezing the images through a tiny bottleneck made the models lose the sharp details. 
-* **What I tried:** I upgraded my CNNs by adding **Skip Connections** (kind of like a ResNet). I basically took the output from the early layers and added it straight into the decoding layers. I also tried swapping out standard MaxPool layers for strided convolutions to see if the model could learn how to downsample better on its own.
-* **The results:** Massive improvement. Because the decoder had access to those early high-res details, the reconstructed letters came out way crisper and sharper. 
+I noticed that squeezing the images through a tiny bottleneck made the models lose the sharp details. I also wanted to ensure the network was learning as efficiently as possible.
+* **What I tried:** * **Skip Connections:** I upgraded my CNNs by adding Skip Connections (kind of like a ResNet). I basically took the output from the early layers and added it straight into the decoding layers. 
+  * **LeakyReLU (0.2):** I swapped out standard ReLU for `LeakyReLU` with a 0.2 negative slope. This ensured that neurons which would have otherwise "died" (outputting zero and stopping learning) were kept active and contributing to the network!
+  * **Strided Convolutions:** I tried swapping out standard MaxPool layers for strided convolutions to see if the model could learn how to downsample better on its own.
+* **The results:** Massive improvement. Because the decoder had access to those early high-res details and the neurons were kept healthy, the reconstructed letters came out way crisper and sharper. 
 
 ## 3. The Final Showdown
 **File:** `residual-cnn-deep-ann-autoencoders-on-emnist.ipynb`
@@ -38,6 +40,6 @@ Here is the visual proof from the final showdown! As you can see, the deep CNN a
 ---
 
 ## 🛠 Tech Stack
-* **Framework:** PyTorch (for the models, loss calculations, and training loops)
+* **Framework:** PyTorch (for the models, custom data loaders, loss calculations, and training loops)
 * **Data:** `torchvision.datasets` (EMNIST)
 * **Visuals:** Matplotlib (for checking the "Original vs. Reconstructed" images, plotting loss, and PCA scatter plots)
